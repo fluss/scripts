@@ -31,17 +31,22 @@ EOF
 yarn init
 rm .editorconfig .gitattributes
 
-if [ -f "package.json" ]; then
-    if command -v jq &> /dev/null; then
-        jq '. + {"workspaces": ["app"]}' package.json > package.json.tmp && mv package.json.tmp package.json
-        echo "✓ package.json has been updated with workspaces!"
+if [ -f "sst.config.ts" ]; then
+    if grep -q "await import('./infra/authModule')" sst.config.ts; then
+        echo "✓ sst.config.ts already contains the authModule import"
     else
-        sed -i.bak 's/"packageManager":/"workspaces": [\n    "app"\n  ],\n  "packageManager":/' package.json
-        rm package.json.bak 2>/dev/null
-        echo "✓ package.json has been updated with workspaces (using sed)!"
+        awk '
+        {
+          if ($0 ~ /async run\(\) *{ *}/) {
+            sub(/async run\(\) *{ *}/, "async run() {\n    await import(\"./infra/authModule\")\n  }")
+          }
+          print
+        }' sst.config.ts > sst.config.ts.tmp \
+        && mv sst.config.ts.tmp sst.config.ts
+        echo "✓ sst.config.ts has been updated with authModule import!"
     fi
 else
-    echo "⚠ Warning: package.json not found, skipping workspace setup"
+    echo "⚠ Warning: sst.config.ts not found, skipping SST config setup"
 fi
 
 echo "✓ .yarnrc.yml has been created successfully!"
