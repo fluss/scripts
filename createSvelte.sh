@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -- "$0"
 
 echo "installing jq"
 brew install jq
@@ -259,8 +260,6 @@ cat > config.json << EOF
   }
 }
 EOF
-
-rm -- "$0"
 
 cd app
 
