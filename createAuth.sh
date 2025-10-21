@@ -33,23 +33,6 @@ EOF
 yarn init
 rm .editorconfig .gitattributes
 
-if [ -f "sst.config.ts" ]; then
-    if grep -q "await import('./infra/authModule')" sst.config.ts; then
-        echo "✓ sst.config.ts already contains the authModule import"
-    else
-        awk '
-        {
-          if ($0 ~ /async run\(\) *{ *}/) {
-            sub(/async run\(\) *{ *}/, "async run() {\n    await import(\"./infra/authModule\")\n  }")
-          }
-          print
-        }' sst.config.ts > sst.config.ts.tmp \
-        && mv sst.config.ts.tmp sst.config.ts
-        echo "✓ sst.config.ts has been updated with authModule import!"
-    fi
-else
-    echo "⚠ Warning: sst.config.ts not found, skipping SST config setup"
-fi
 
 echo "✓ .yarnrc.yml has been created successfully!"
 
@@ -74,9 +57,15 @@ if [ -f "sst.config.ts" ]; then
     if grep -q "await import('./infra/authModule')" sst.config.ts; then
         echo "✓ sst.config.ts already contains the authModule import"
     else
-      sed -i.bak "s/async run() { }/async run() {\n    await import('.\/infra\/authModule')\n  }/" sst.config.ts
-      rm sst.config.ts.bak 2>/dev/null
-      echo "✓ sst.config.ts has been updated with authModule import!"
+        awk '
+        {
+          if ($0 ~ /async run\(\) *{ *}/) {
+            sub(/async run\(\) *{ *}/, "async run() {\n    await import(\"./infra/authModule\")\n  }")
+          }
+          print
+        }' sst.config.ts > sst.config.ts.tmp \
+        && mv sst.config.ts.tmp sst.config.ts
+        echo "✓ sst.config.ts has been updated with authModule import!"
     fi
 else
     echo "⚠ Warning: sst.config.ts not found, skipping SST config setup"
