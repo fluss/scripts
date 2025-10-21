@@ -121,3 +121,5 @@ cat > config.json << EOF
 EOF
 
 echo "once you have setup your profile and region for your sst config, deploy by running yarn sst deploy --stage=<YOUR_STAGE> or yarn sst dev --stage=<YOUR_STAGE>"
+
+rm -- "$0"

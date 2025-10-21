@@ -260,6 +260,8 @@ cat > config.json << EOF
 }
 EOF
 
+rm -- "$0"
+
 cd app
 
-yarn dev
+echo "Run yarn dev to generate the .sveltekit, you may need to run this twice"s
